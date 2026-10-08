@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://www.mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bigdata.mapper.ScoreMapper">
+
+    <!-- 按条件查询成绩明细，关联学生姓名 -->
+    <select id="findByCondition" resultType="java.util.Map">
+        select s.*, stu.name as student_name
+        from t_score s
+                 left join t_student stu on s.student_id = stu.id
+        where s.exam_id = #{examId}
+          and s.class_id = #{classId}
+          and s.course_id = #{courseId}
+        order by s.score desc
+    </select>
+
+    <!-- 班级单科统计 -->
+    <!-- ScoreMapper.xml -->
+    <select id="statClassCourse" resultType="java.util.Map">
+        SELECT
+        ROUND(AVG(score), 6) AS avg_score,   -- 平均分
+        MAX(score) AS max_score,             -- 最高分
+        MIN(score) AS min_score,             -- 最低分
+        -- 及格率：及格人数 / 总人数，保留6位小数
+        ROUND(SUM(CASE WHEN score >= 60 THEN 1 ELSE 0 END) / COUNT(*), 6) AS pass_rate
+        FROM t_score
+        WHERE exam_id = #{examId}
+        AND class_id = #{classId}
+        AND course_id = #{courseId}
+    </select>
+
+    <!-- 学生总分排名 -->
+    <select id="getStudentTotalRank" resultType="java.util.Map">
+        select student_id, sum(score) as total_score
+        from t_score
+        where exam_id = #{examId}
+          and class_id = #{classId}
+        group by student_id
+        order by total_score desc
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        insert into t_score(exam_id, student_id, course_id, class_id, score)
+        values (#{examId}, #{studentId}, #{courseId}, #{classId}, #{score})
+    </insert>
+
+    <update id="update">
+        update t_score
+        set score = #{score}
+        where id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        delete from t_score where id = #{id}
+    </delete>
+
+</mapper>

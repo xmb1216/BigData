@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bigdata.mapper.ClazzMapper">
+
+    <select id="findAll" resultType="com.bigdata.entity.Clazz">
+        select * from t_class order by grade_year desc
+    </select>
+
+    <select id="findById" resultType="com.bigdata.entity.Clazz">
+        select * from t_class where id = #{id}
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        insert into t_class(grade_year, class_name)
+        values (#{gradeYear}, #{className})
+    </insert>
+
+    <update id="update">
+        update t_class
+        set grade_year = #{gradeYear},
+            class_name = #{className}
+        where id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        delete from t_class where id = #{id}
+    </delete>
+
+</mapper>
